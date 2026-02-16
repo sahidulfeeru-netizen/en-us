@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wholopedia:A free encyclopedia</title>
+    <style>
+        :root {
+            --bg: #000000;
+            --card: #0c0c0c;
+            --accent: #6366f1;
+            --text: #ffffff;
+            --border: #222;
+            --footer-bg: #ff8c00;
+            --footer-text: #004d00;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; }
+        body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+
+        /* Loading Overlay */
+        #fetchOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.98); display: none; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 9999;
+        }
+        .spinner { width: 50px; height: 50px; border: 4px solid #111; border-top: 4px solid var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Universal Navigation */
+        nav {
+            background: rgba(0,0,0,0.95); padding: 15px 4%; border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center;
+        }
+        .logo { font-weight: 900; color: var(--accent); cursor: pointer; font-size: 1.2rem; letter-spacing: 3px; }
+        .nav-tools { display: flex; gap: 15px; }
+        .btn-random { background: #111; color: white; border: 1px solid var(--border); padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; }
+
+        /* Header Attribution */
+        .welcome-header { text-align: center; padding: 60px 5% 20px; }
+        .welcome-header h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 900; line-height: 1.1; }
+        .attribution { 
+            color: var(--accent); 
+            font-size: 0.85rem; 
+            letter-spacing: 2px; 
+            text-transform: uppercase; 
+            margin-top: 20px; 
+            font-weight: 600; 
+            opacity: 0.9;
+        }
+        .article-count { color: #555; margin-left: 10px; border-left: 1px solid #333; padding-left: 10px; }
+        
+        /* Ultra-Wide Search */
+        .search-container { width: 100%; padding: 30px 4%; }
+        .search-area { position: relative; width: 100%; max-width: 1400px; margin: 0 auto; }
+        .search-bar {
+            width: 100%; background: #000; border: 2px solid var(--border);
+            color: white; padding: 22px 30px; border-radius: 12px; outline: none; font-size: 1.2rem;
+        }
+        .suggestions {
+            position: absolute; top: 100%; left: 0; width: 100%;
+            background: #0d0d0d; border: 2px solid var(--accent); border-top: none;
+            display: none; z-index: 2000;
+        }
+        .suggestions.active { display: block; }
+        .sug-item { padding: 18px 30px; cursor: pointer; border-bottom: 1px solid #1a1a1a; font-size: 1.1rem; }
+
+        /* Today's Featured Section */
+        .featured-section { padding: 40px 4%; max-width: 1600px; margin: 0 auto; width: 100%; }
+        .featured-card { 
+            display: flex; background: #080808; border: 1px solid var(--border);
+            border-radius: 20px; overflow: hidden; cursor: pointer; flex-direction: column;
+            transition: 0.3s;
+        }
+        .featured-card:hover { border-color: var(--accent); }
+        .feat-img { width: 100%; height: 300px; object-fit: cover; background: #111; }
+        .feat-content { padding: 40px; flex: 1; }
+
+        /* Article View */
+        #articleView { display: none; width: 100%; max-width: 1500px; margin: 0 auto; padding: 40px 4%; }
+        .article-controls { display: flex; justify-content: flex-end; margin-bottom: 20px; }
+        .btn-offline { 
+            background: transparent; border: 1px solid var(--accent); color: var(--accent);
+            padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: bold;
+        }
+        .article-title { font-size: clamp(2rem, 5vw, 4rem); color: var(--accent); margin-bottom: 30px; font-weight: 800; border-bottom: 2px solid var(--border); padding-bottom: 20px; }
+        .article-body { line-height: 1.8; font-size: 1.3rem; color: #ddd; }
+        .article-body img { max-width: 100% !important; height: auto !important; margin: 40px auto; display: block; border-radius: 12px; }
+
+        /* Responsive News Feed */
+        main { flex: 1; padding: 40px 4%; width: 100%; }
+        .news-grid { 
+            display: grid; gap: 25px; 
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
+        }
+        .news-card { background: var(--card); border: 1px solid var(--border); border-radius: 15px; cursor: pointer; overflow: hidden; transition: 0.3s; }
+        .news-card:hover { transform: translateY(-10px); border-color: var(--accent); }
+        .news-img { width: 100%; height: 220px; object-fit: cover; }
+        .news-info { padding: 25px; }
+
+        /* Orange & Green Footer */
+        footer { 
+            background: var(--footer-bg); color: var(--footer-text); 
+            padding: 80px 5%; margin-top: 80px; border-top: 15px solid #004d00;
+        }
+        .footer-grid { display: grid; gap: 50px; grid-template-columns: 1fr; max-width: 1600px; margin: 0 auto; }
+        .footer-about h3 { font-size: 2.5rem; margin-bottom: 20px; font-weight: 900; color: #003300; }
+        .footer-links a { color: var(--footer-text); font-weight: 800; text-decoration: none; display: block; margin-bottom: 15px; font-size: 1.1rem; }
+
+        /* Desktop Adjustments */
+        @media (min-width: 992px) {
+            .featured-card { flex-direction: row; height: 450px; }
+            .feat-img { width: 45%; height: 100%; }
+            .footer-grid { grid-template-columns: 2fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="fetchOverlay">
+    <div class="spinner"></div>
+    <p style="margin-top:20px; color:var(--accent); letter-spacing:3px; font-weight: bold;">FETCHING THE ARTICLE...</p>
+</div>
+
+<nav>
+    <div class="logo" onclick="location.hash=''; location.reload();">WHOLOPEDIA</div>
+    <div class="nav-tools">
+        <button class="btn-random" onclick="goRandom()">RANDOM ARTICLE</button>
+        <div id="heartbeat" style="font-family:monospace; color:#444; font-size: 0.7rem; align-self: center;">PULSE: OK</div>
+    </div>
+</nav>
+
+<div id="homeUI">
+    <div class="welcome-header">
+        <h1>Welcome to Wholopedia</h1>
+        <div class="attribution">
+            A project by imtiaz shaikh <span class="article-count">with 6 million articles</span>
+        </div>
+    </div>
+
+    <div class="search-container">
+        <div class="search-area">
+            <input type="text" id="searchInput" class="search-bar" placeholder="Explore the world of knowledge...">
+            <div id="suggestions" class="suggestions"></div>
+        </div>
+    </div>
+
+    <div class="featured-section">
+        <h2 style="color:var(--accent); font-size: 0.8rem; letter-spacing: 4px; margin-bottom: 20px;">TODAY'S FEATURED ARTICLE</h2>
+        <div id="featuredCard" class="featured-card">
+            <img id="featImg" src="" class="feat-img">
+            <div class="feat-content">
+                <h2 id="featTitle" style="margin-bottom:15px; font-size: 2.2rem;">...</h2>
+                <p id="featDesc" style="color:#aaa; line-height:1.7; font-size: 1.1rem;"></p>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <h2 style="color:var(--accent); font-size: 0.8rem; letter-spacing: 4px; margin-bottom: 25px;">LIVE GLOBAL FEED (5s SYNC)</h2>
+        <div id="newsGrid" class="news-grid"></div>
+    </main>
+</div>
+
+<main id="articleView">
+    <div class="article-controls">
+        <button class="btn-offline" onclick="saveOffline()">SYNC TO LOCAL STORAGE</button>
+    </div>
+    <h1 id="articleTitle" class="article-title"></h1>
+    <div id="articleBody" class="article-body"></div>
+</main>
+
+<footer>
+    <div class="footer-grid">
+        <div class="footer-about">
+            <h3>Wholopedia</h3>
+            <p>Wholopedia is a premium open-knowledge terminal developed by Imtiaz Shaikh. By utilizing decentralized data synchronization, we provide a wide-screen, high-performance experience, delivering the latest global updates and history in real-time.</p>
+        </div>
+        <div class="footer-links">
+            <h4 style="margin-bottom:20px; font-weight: 900; color: #003300; font-size: 1.4rem;">Social Terminal</h4>
+            <a href="#">Official Facebook</a>
+            <a href="#">Twitter / X</a>
+            <a href="#">GitHub Repository</a>
+            <a href="#">Join the Discord</a>
+        </div>
+    </div>
+    <div style="text-align:center; margin-top:60px; font-size:0.8rem; color:#004d00; font-weight:bold; letter-spacing: 3px;">CORE ENGINE DESIGNED BY IMTIAZ SHAIKH © 2026</div>
+</footer>
+
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const suggestionsBox = document.getElementById('suggestions');
+    const overlay = document.getElementById('fetchOverlay');
+
+    async function getImg(title) {
+        try {
+            const r = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&prop=pageimages&format=json&pithumbsize=1000&origin=*`);
+            const d = await r.json();
+            const pages = d.query.pages;
+            const key = Object.keys(pages)[0];
+            return pages[key].thumbnail ? pages[key].thumbnail.source : `https://images.weserv.nl/?url=https://en.wikipedia.org/wiki/Special:FilePath/${encodeURIComponent(title)}.jpg&w=1000`;
+        } catch { return "https://via.placeholder.com/1000x500?text=Wholopedia"; }
+    }
+
+    async function fetchFeatured() {
+        const today = new Date().toISOString().slice(0, 10).replace(/-/g, '/');
+        try {
+            const res = await fetch(`https://en.wikipedia.org/api/rest_v1/feed/featured/${today}`);
+            const data = await res.json();
+            const art = data.tfa;
+            document.getElementById('featTitle').innerText = art.title;
+            document.getElementById('featDesc').innerText = art.extract;
+            document.getElementById('featImg').src = art.thumbnail ? art.thumbnail.source : '';
+            document.getElementById('featuredCard').onclick = () => location.hash = `wiki/${art.title.replace(/ /g, '_')}`;
+        } catch (e) {}
+    }
+
+    async function fetchNews() {
+        try {
+            const res = await fetch(`https://en.wikipedia.org/w/api.php?action=parse&page=Template:In_the_news&format=json&origin=*&prop=text`);
+            const data = await res.json();
+            const doc = new DOMParser().parseFromString(data.parse.text["*"], 'text/html');
+            const items = Array.from(doc.querySelectorAll('li')).slice(0, 12);
+
+            const cards = await Promise.all(items.map(async (li) => {
+                const link = li.querySelector('b a') || li.querySelector('a');
+                if (!link) return '';
+                const title = link.title;
+                const img = await getImg(title);
+                return `
+                    <div class="news-card" onclick="location.hash='wiki/${title.replace(/ /g, '_')}'">
+                        <img src="${img}" class="news-img" onerror="this.src='https://via.placeholder.com/400x220?text=News'">
+                        <div class="news-info">
+                            <h4 style="margin-bottom:10px;">${title}</h4>
+                            <p style="color:#888; font-size:0.9rem;">${li.innerText.split('(')[0]}</p>
+                        </div>
+                    </div>`;
+            }));
+            document.getElementById('newsGrid').innerHTML = cards.join('');
+            document.getElementById('heartbeat').innerText = "PULSE: " + new Date().toLocaleTimeString();
+        } catch (e) {}
+    }
+
+    async function loadPage(name) {
+        overlay.style.display = 'flex';
+        try {
+            const res = await fetch(`https://en.wikipedia.org/w/api.php?action=parse&page=${encodeURIComponent(name)}&format=json&origin=*&prop=text|displaytitle`);
+            const data = await res.json();
+            
+            document.getElementById('homeUI').style.display = 'none';
+            document.getElementById('articleView').style.display = 'block';
+            
+            const title = data.parse.title;
+            const customTitle = `Everything about ${title} : Wholopedia`;
+            document.getElementById('articleTitle').innerText = customTitle;
+            document.title = customTitle;
+            
+            let content = data.parse.text["*"];
+            content = content.replace(/src="\/\//g, 'src="https://');
+            content = content.replace(/href="\/wiki\//g, 'href="#wiki/');
+            document.getElementById('articleBody').innerHTML = content;
+            window.scrollTo(0,0);
+        } catch (e) { }
+        setTimeout(() => overlay.style.display = 'none', 600);
+    }
+
+    async function goRandom() {
+        overlay.style.display = 'flex';
+        const res = await fetch('https://en.wikipedia.org/w/api.php?action=query&list=random&rnnamespace=0&rnlimit=1&format=json&origin=*');
+        const data = await res.json();
+        const title = data.query.random[0].title;
+        location.hash = `wiki/${title.replace(/ /g, '_')}`;
+    }
+
+    function saveOffline() {
+        const title = document.getElementById('articleTitle').innerText;
+        const body = document.getElementById('articleBody').innerHTML;
+        localStorage.setItem(window.location.hash, JSON.stringify({title, body, date: new Date()}));
+        alert("Knowledge Base Updated: Article saved for offline browsing.");
+    }
+
+    searchInput.addEventListener('input', async () => {
+        const val = searchInput.value.trim();
+        if (val.length < 2) return suggestionsBox.classList.remove('active');
+        const r = await fetch(`https://en.wikipedia.org/w/api.php?action=opensearch&search=${val}&limit=8&format=json&origin=*`);
+        const d = await r.json();
+        suggestionsBox.innerHTML = d[1].map(t => `<div class="sug-item" onclick="location.hash='wiki/${t.replace(/ /g, '_')}'">${t}</div>`).join('');
+        suggestionsBox.classList.add('active');
+    });
+
+    window.onhashchange = () => {
+        if(location.hash.startsWith('#wiki/')) {
+            loadPage(decodeURIComponent(location.hash.substring(6)).replace(/_/g, ' '));
+        }
+    };
+
+    window.onload = () => {
+        fetchFeatured();
+        fetchNews();
+        setInterval(fetchNews, 5000);
+        if(location.hash.startsWith('#wiki/')) {
+            loadPage(decodeURIComponent(location.hash.substring(6)).replace(/_/g, ' '));
+        }
+    };
+</script>
+</body>
+</html>
