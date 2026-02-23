@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASPHALT LEGENDS | APEX LIVE DATABASE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root { --racing-red: #ff0044; --neon-blue: #0088ff; --glass-bg: rgba(0,0,0,0.85); }
+        body { font-family: 'Inter', sans-serif; background-color: #000; color: #fff; margin: 0; overflow-x: hidden; }
+        .font-racing { font-family: 'Orbitron', sans-serif; }
+        
+        /* THE TRINITY LOGO */
+        .logo-box { display: flex; align-items: center; gap: 8px; }
+        .arrows { display: flex; flex-direction: column; line-height: 0.5; }
+        .u-red { color: var(--racing-red); font-size: 1.5rem; text-shadow: 0 0 10px var(--racing-red); }
+        .d-blue { color: var(--neon-blue); font-size: 0.9rem; text-shadow: 0 0 8px var(--neon-blue); }
+
+        .page-content { display: none; min-height: 100vh; position: relative; animation: fadeIn 0.3s ease; }
+        .active-page { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .bg-img { position: absolute; inset: 0; z-index: -1; filter: brightness(0.25); transition: 0.8s; }
+        .bg-img img { width: 100%; height: 100%; object-fit: cover; }
+        .glass { background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
+
+        /* NOTIFICATION */
+        #notification {
+            position: fixed; top: 90px; right: -450px; z-index: 1000;
+            background: var(--racing-red); padding: 15px 25px; font-family: 'Orbitron';
+            border-left: 6px solid #fff; box-shadow: 0 0 40px rgba(255, 0, 68, 0.6);
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #notification.show { right: 20px; }
+
+        /* SCROLLING CONSOLE */
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: var(--racing-red); }
+    </style>
+</head>
+<body>
+
+    <div id="notification">
+        <span id="notif-text">UNIT SYNCHRONIZED</span>
+    </div>
+
+    <nav class="fixed w-full z-[100] bg-black/95 border-b border-red-600/30 px-6 py-4 flex justify-between items-center">
+        <div class="logo-box cursor-pointer" onclick="showPage('showroom')">
+            <div class="arrows">
+                <i class="fas fa-caret-up u-red"></i>
+                <i class="fas fa-caret-down d-blue"></i>
+                <i class="fas fa-caret-down d-blue"></i>
+            </div>
+            <div class="font-racing">
+                <span class="text-red-600 text-lg md:text-xl font-900 italic block">ASPHALT LEGENDS</span>
+                <span class="text-blue-500 text-[8px] tracking-[0.4em]">LIVE GAME DATABASE</span>
+            </div>
+        </div>
+        <div class="flex space-x-5 md:space-x-8 font-racing text-[9px] md:text-[10px]">
+            <button onclick="showPage('showroom')" class="hover:text-red-500">HOME</button>
+            <button onclick="showPage('garage')" class="hover:text-red-500">DATABASE</button>
+            <button onclick="showPage('updates')" class="hover:text-red-500 text-blue-400">GAME UPDATES</button>
+        </div>
+    </nav>
+
+    <main id="showroom" class="page-content active-page pt-32">
+        <div class="bg-img"><img id="home-bg" src="https://images.unsplash.com/photo-1605733513597-a8f8d410fe3c?q=80&w=1600"></div>
+        <div class="container mx-auto px-8">
+            <p class="font-racing text-[10px] text-blue-400 tracking-[0.5em] mb-2 uppercase">Currently Deployed</p>
+            <h1 id="home-name" class="font-racing italic text-5xl md:text-8xl mb-8 uppercase leading-none">BUGATTI<br><span class="text-red-600">CHIRON</span></h1>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mb-12">
+                <div class="glass p-5"><p class="text-[9px] text-gray-500 font-racing">SPEED</p><p id="h-speed" class="text-xl font-racing">420 KM/H</p></div>
+                <div class="glass p-5"><p class="text-[9px] text-gray-500 font-racing">ACCEL</p><p id="h-accel" class="text-xl font-racing">2.4s</p></div>
+                <div class="glass p-5"><p class="text-[9px] text-gray-500 font-racing">CLASS</p><p id="h-rank" class="text-xl font-racing text-red-600">S-ULTRA</p></div>
+                <div class="glass p-5"><p class="text-[9px] text-gray-500 font-racing">ID</p><p id="h-pi" class="text-xl font-racing text-blue-500">4920</p></div>
+            </div>
+            <button onclick="showPage('garage')" class="bg-red-600 px-12 py-5 font-racing font-bold hover:bg-white hover:text-black transition uppercase tracking-widest">
+                Choose Car for Game
+            </button>
+        </div>
+    </main>
+
+    <section id="garage" class="page-content pt-32 px-8 pb-20">
+        <div class="bg-img"><img src="https://images.unsplash.com/photo-1544636331-e26879cd4d9b?q=80&w=1600"></div>
+        <div class="container mx-auto">
+            <h2 class="font-racing text-3xl mb-10 italic">VEHICLE ARCHIVE <span class="text-red-600 text-xs">/ 240+ UNITS</span></h2>
+            <div id="car-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-3"></div>
+        </div>
+    </section>
+
+    <section id="updates" class="page-content pt-32 px-8 pb-12">
+        <div class="bg-img"><img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1600"></div>
+        <div class="container mx-auto max-w-6xl">
+            <div class="grid lg:grid-cols-3 gap-6">
+                
+                <div class="lg:col-span-2 glass p-6 rounded-lg">
+                    <h3 class="font-racing text-red-600 text-xl mb-6 flex items-center gap-3">
+                        <i class="fas fa-tools"></i> GAME PATCH NOTES v4.2.0
+                    </h3>
+                    <div class="space-y-6 overflow-y-auto max-h-[500px] pr-4 custom-scroll">
+                        <div class="border-l-2 border-blue-500 pl-4">
+                            <h4 class="font-racing text-xs text-blue-400 mb-2">NEW CONTENT</h4>
+                            <p class="text-sm text-gray-300">Added 5 new S-Class variants including the Rimac Nevera Time-Attack Edition. Optimized 240+ existing car assets for ultra-fast loading.</p>
+                        </div>
+                        <div class="border-l-2 border-red-500 pl-4">
+                            <h4 class="font-racing text-xs text-red-400 mb-2">BALANCE CHANGES</h4>
+                            <p class="text-sm text-gray-300">Bugatti Chiron nitro efficiency increased by 4%. Lamborghini top speed cap adjusted for multiplayer fairness.</p>
+                        </div>
+                        <div class="border-l-2 border-green-500 pl-4">
+                            <h4 class="font-racing text-xs text-green-400 mb-2">SYSTEM OPTIMIZATION</h4>
+                            <p class="text-sm text-gray-300">Reduced database latency by 40ms. Implemented new responsive grid for mobile devices.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass p-6 rounded-lg">
+                    <h3 class="font-racing text-blue-500 text-xl mb-6 flex items-center gap-3">
+                        <i class="fas fa-satellite-dish"></i> LIVE FEED
+                    </h3>
+                    <div id="console" class="bg-black/80 h-[400px] overflow-hidden font-mono text-[10px] p-4 text-green-500 space-y-2 border border-white/5">
+                        </div>
+                    <div class="mt-4 p-3 bg-red-600/10 rounded flex justify-between items-center">
+                        <span class="font-racing text-[9px]">SERVER STATUS:</span>
+                        <span class="text-green-500 text-[9px] animate-pulse font-bold">OPTIMAL</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <div id="car-overlay" class="fixed inset-0 z-[500] bg-black/95 hidden items-center justify-center p-6">
+        <div class="glass max-w-2xl w-full p-8 border-t-4 border-red-600 rounded-xl text-center">
+            <img id="m-img" src="" class="w-full h-56 object-cover rounded-lg mb-6 shadow-2xl">
+            <h2 id="m-name" class="font-racing text-4xl italic mb-6">NAME</h2>
+            <div class="flex gap-4 mb-8">
+                <button onclick="finalizeSave()" class="flex-1 bg-red-600 py-4 font-racing font-bold hover:invert transition uppercase">Save to Homepage</button>
+                <button onclick="closeModal()" class="px-8 border border-white/20 font-racing text-xs uppercase">Exit</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedCar = {};
+
+        function showPage(p) {
+            document.querySelectorAll('.page-content').forEach(c => c.classList.remove('active-page'));
+            document.getElementById(p).classList.add('active-page');
+            window.scrollTo(0,0);
+        }
+
+        function openModal(name, speed, accel, pi, img) {
+            selectedCar = { name, speed, accel, pi, img };
+            document.getElementById('m-name').innerText = name;
+            document.getElementById('m-img').src = img;
+            document.getElementById('car-overlay').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('car-overlay').style.display = 'none'; }
+
+        function finalizeSave() {
+            document.getElementById('home-name').innerHTML = selectedCar.name.replace(' ', '<br><span class="text-red-600">') + '</span>';
+            document.getElementById('home-bg').src = selectedCar.img;
+            document.getElementById('h-speed').innerText = selectedCar.speed;
+            document.getElementById('h-accel').innerText = selectedCar.accel;
+            document.getElementById('h-pi').innerText = selectedCar.pi;
+            
+            closeModal();
+            // Trigger Notification with Car Name
+            const toast = document.getElementById('notification');
+            document.getElementById('notif-text').innerText = `${selectedCar.name} DEPLOYED`;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+            
+            showPage('showroom');
+        }
+
+        // GENERATE 240+ CARS
+        const brands = ["Bugatti", "Ferrari", "Lambo", "Porsche", "McLaren", "Rimac", "Pagani", "Aston"];
+        const grid = document.getElementById('car-grid');
+        let html = "";
+        for (let i = 1; i <= 244; i++) {
+            const name = `${brands[i % brands.length]} Mod.${i}`;
+            const img = `https://loremflickr.com/400/300/supercar,car/all?lock=${i + 60}`;
+            html += `
+                <div class="glass p-1 cursor-pointer hover:border-red-600 transition" onclick="openModal('${name}','${320+i} KM/H','${(1.5+i/200).toFixed(2)}s',${4000+i},'${img}')">
+                    <img src="${img}" loading="lazy" class="w-full h-24 object-cover">
+                    <p class="text-[7px] font-racing mt-2 truncate">${name}</p>
+                </div>`;
+        }
+        grid.innerHTML = html;
+
+        // LIVE GAME LOGS
+        const consoleEl = document.getElementById('console');
+        const logs = [
+            "GLOBAL_RANKING_UPDATE: PLAYER_ALPHA WON SEOUL_CUP",
+            "CAR_ID_88 NITRO_BURN_SYNC_SUCCESS",
+            "NEW_ITEM_UNLOCKED: TITANIUM_CHASSIS",
+            "SERVER_REACHED: 12ms LATENCY",
+            "MARKETPLACE_REFRESH: 12 NEW CARS ADDED",
+            "EVENT_SYNC: NEON_NIGHTS_CHALLENGE ACTIVE"
+        ];
+
+        setInterval(() => {
+            const p = document.createElement('p');
+            p.innerHTML = `<span class="text-gray-500">[${new Date().toLocaleTimeString()}]</span> >> ${logs[Math.floor(Math.random()*logs.length)]}`;
+            consoleEl.prepend(p);
+            if(consoleEl.children.length > 22) consoleEl.lastChild.remove();
+        }, 1200);
+    </script>
+</body>
+</html>
